@@ -18,7 +18,6 @@ class CybersafetyConversation extends Conversation
     public $app;
     public $pd;
 
-
     public function welcome()
     {
         $this->app = new Application();
