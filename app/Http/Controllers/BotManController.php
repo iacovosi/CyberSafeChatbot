@@ -6,7 +6,7 @@ use BotMan\BotMan\BotMan;
 use Illuminate\Http\Request;
 use App\Conversations\ExampleConversation;
 use App\Conversations\ExampleConversationIacovos;
-
+use App\Conversations\CybersafetyConversation;
 class BotManController extends Controller
 {
     /**
@@ -35,6 +35,14 @@ class BotManController extends Controller
     {
         $bot->startConversation(new ExampleConversation());
     }
+
+
+    public function startCybersafetyConversation(BotMan $bot)
+    {
+        $bot->startConversation(new CyberSafetyConversation());
+    }
+
+
 
     /**
      * Loaded through routes/botman.php

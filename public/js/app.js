@@ -13957,8 +13957,8 @@ if (token) {
 
 // window.Echo = new Echo({
 //     broadcaster: 'pusher',
-//     key: process.env.MIX_PUSHER_APP_KEY,
-//     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+//     key: process..env.MIX_PUSHER_APP_KEY,
+//     cluster: process..env.MIX_PUSHER_APP_CLUSTER,
 //     encrypted: true
 // });
 
@@ -35594,7 +35594,7 @@ module.exports = (
     };
   })() :
 
-  // Non standard browser env (web workers, react-native) lack needed support.
+  // Non standard browser .env (web workers, react-native) lack needed support.
   (function nonStandardBrowserEnv() {
     return {
       write: function write() {},
@@ -48857,7 +48857,7 @@ module.exports = (
     };
   })() :
 
-  // Non standard browser env (web workers, react-native) lack needed support.
+  // Non standard browser .env (web workers, react-native) lack needed support.
   (function nonStandardBrowserEnv() {
     return {
       write: function write() {},

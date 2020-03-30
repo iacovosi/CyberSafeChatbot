@@ -41,3 +41,4 @@ $botman->hears('call me {name}', function ($bot, $name) {
 $botman->hears('Start conversation', BotManController::class.'@startConversation');
 
 $botman->hears('help', BotManController::class.'@startConversationIacovos');
+$botman->hears('form', BotManController::class.'@startCybersafetyConversation');
