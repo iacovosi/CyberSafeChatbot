@@ -57,6 +57,8 @@ class CybersafetyConversation extends Conversation
             if ($answer->isInteractiveMessageReply()) {
 //                $this->where = $answer->getValue();
                 App::setLocale($answer->getValue());
+
+                 $this->say("Hello,Για".@lang('lang.choose'));
             }
             else {
                 App::setLocale("en");
