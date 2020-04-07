@@ -7,11 +7,13 @@ use BotMan\BotMan\Messages\Conversations\Conversation;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use BotMan\BotMan\Messages\Outgoing\Question;
+
 //use App\Mail\TestMail;
 //use Illuminate\Support\Facades\Mail;
 use App\utilities\Application;
 use App\utilities\PersonalDetails;
 use Mail;
+use App\Report;
 
 class CybersafetyConversation extends Conversation
 {
@@ -22,7 +24,7 @@ class CybersafetyConversation extends Conversation
     public function welcome()
     {
         $this->app = new Application();
-
+        $this->AskLocale();
         $this->say('Hello, Welcome to Cybersafety website');
         $question = Question::create("Hotline or Helpline?")
             ->fallback('Unable to ask question')
@@ -40,6 +42,26 @@ class CybersafetyConversation extends Conversation
             $this->askWhere();
         });
 
+    }
+
+    public function AskLocale() {
+        $question = Question::create("Language?")
+            ->fallback('Unable to ask question')
+            ->callbackId('ask_reason')
+            ->addButtons([
+                Button::create('English/Αγγλικά')->value('en'),
+                Button::create('Greek/Ελληνικα')->value('gr'),
+            ]);
+
+        $this->ask($question, function (Answer $answer) {
+            if ($answer->isInteractiveMessageReply()) {
+//                $this->where = $answer->getValue();
+                App::setLocale($answer->getValue());
+            }
+            else {
+                App::setLocale("en");
+            }
+        });
     }
 
     public function askWhere()
@@ -290,7 +312,7 @@ class CybersafetyConversation extends Conversation
         error_log($this->pd->getAge());
         error_log($this->pd->getGender());
 
-        //$this->storeToDB();
+        $this->storeToDB();
 
         $this->sendEmail();
 
@@ -309,16 +331,18 @@ class CybersafetyConversation extends Conversation
         error_log($this->app->getDescription());
         error_log($this->app->getPersonalData()); //this is anonymous or non-anonymous
 
-        //$this->storeToDB();
+        $this->storeToDB();
         $this->sendEmail();
 
     }
 
+    //cybersafe.chatbot@gmail.com
+    //chat123!
     public function sendEmail()
     {
         $to_name = 'CyberSafe Team';
         $to_email = 'iacovos.ioannou@gmail.com';
-        $data = array("name" => "CyberSafe Chatbot Reciever of CyberSafe Team", 'results' => $this->app->returnResultOfChatBot(),'personal_information'=>$this->pd->getPersonalDetails(),"body"=>"With Regards CyberSafe ChatBot");
+        $data = array("name" => "CyberSafe Chatbot Reciever of CyberSafe Team", 'results' => $this->app->returnResultOfChatBot(), 'personal_information' => $this->pd->getPersonalDetails(), "body" => "With Regards CyberSafe ChatBot");
         Mail::send('emails.emailnotify', $data, function ($message) use ($to_name, $to_email) {
             $message->to($to_email, $to_name)->subject('CyberSafe Chatbot Result for Report');
             $message->from('cybersafe.chatbot@gmail.com', 'CyberSafe Chatbot Mail');
@@ -329,7 +353,20 @@ class CybersafetyConversation extends Conversation
 
     public function storeToDB()
     {
-
+        $data = Array();
+        $data['category'] = $this->app->getCategory();
+        $data['where'] = $this->app->getWhere();
+        $data['type'] = $this->app->getType();
+        $data['description'] = $this->app->getDescription();
+        $data['personal_data'] = $this->app->getPersonalData();
+        $data['personal_details'] = $this->app->getPersonalDetails();
+        $data['name'] = $this->pd->getName();
+        $data['surname'] = $this->pd->getSurname();
+        $data['email'] = $this->pd->getEmail();
+        $data['phone'] = $this->pd->getPhone();
+        $data['age'] = $this->pd->getAge();
+        $data['gender'] = $this->pd->getGender();
+        $id = Report::create($data)->id;
 
     }
 
