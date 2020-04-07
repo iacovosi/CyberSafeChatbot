@@ -24,7 +24,7 @@ class Application
     /**
      * @param mixed $category
      */
-    public function setCategory($category): void
+    public function setCategory($category)
     {
         $this->category = $category;
     }
@@ -40,7 +40,7 @@ class Application
     /**
      * @param mixed $where
      */
-    public function setWhere($where): void
+    public function setWhere($where)
     {
         $this->where = $where;
     }
@@ -56,7 +56,7 @@ class Application
     /**
      * @param mixed $type
      */
-    public function setType($type): void
+    public function setType($type)
     {
         $this->type = $type;
     }
@@ -72,7 +72,7 @@ class Application
     /**
      * @param mixed $description
      */
-    public function setDescription($description): void
+    public function setDescription($description)
     {
         $this->description = $description;
     }
@@ -88,7 +88,7 @@ class Application
     /**
      * @param mixed $personal_data
      */
-    public function setPersonalData($personal_data): void
+    public function setPersonalData($personal_data)
     {
         $this->personal_data = $personal_data;
     }
@@ -104,12 +104,16 @@ class Application
     /**
      * @param mixed $personal_details
      */
-    public function setPersonalDetails($personal_details): void
+    public function setPersonalDetails($personal_details)
     {
         $this->personal_details = $personal_details;
     }
 
 
+    public function returnResultOfChatBot()
+    {
+        return "Category: " . $this->category . " where :" . $this->where . " type " . $this->type . " description:" . $this->description . " personal data: " . $this->personal_data . " personal details:" . $this->personal_details;
 
+    }
 
 }

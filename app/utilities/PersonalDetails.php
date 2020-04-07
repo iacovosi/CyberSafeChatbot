@@ -25,7 +25,7 @@ class PersonalDetails
     /**
      * @param mixed $name
      */
-    public function setName($name): void
+    public function setName($name)
     {
         $this->name = $name;
     }
@@ -41,7 +41,7 @@ class PersonalDetails
     /**
      * @param mixed $surname
      */
-    public function setSurname($surname): void
+    public function setSurname($surname)
     {
         $this->surname = $surname;
     }
@@ -57,7 +57,7 @@ class PersonalDetails
     /**
      * @param mixed $email
      */
-    public function setEmail($email): void
+    public function setEmail($email)
     {
         $this->email = $email;
     }
@@ -73,7 +73,7 @@ class PersonalDetails
     /**
      * @param mixed $phone
      */
-    public function setPhone($phone): void
+    public function setPhone($phone)
     {
         $this->phone = $phone;
     }
@@ -89,7 +89,7 @@ class PersonalDetails
     /**
      * @param mixed $age
      */
-    public function setAge($age): void
+    public function setAge($age)
     {
         $this->age = $age;
     }
@@ -105,11 +105,15 @@ class PersonalDetails
     /**
      * @param mixed $gender
      */
-    public function setGender($gender): void
+    public function setGender($gender)
     {
         $this->gender = $gender;
     }
 
+    public function getPersonalDetails()
+    {
+        return "Name:" . $this->name . " surname:" . $this->surname . " email: " . $this->email . " phone:" . $this->phone . " age:" . $this->age . " gender:" . $this->gender;
 
+    }
 
 }

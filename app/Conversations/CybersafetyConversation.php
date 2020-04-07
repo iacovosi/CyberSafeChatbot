@@ -8,9 +8,10 @@ use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use BotMan\BotMan\Messages\Outgoing\Question;
 //use App\Mail\TestMail;
-use Illuminate\Support\Facades\Mail;
+//use Illuminate\Support\Facades\Mail;
 use App\utilities\Application;
 use App\utilities\PersonalDetails;
+use Mail;
 
 class CybersafetyConversation extends Conversation
 {
@@ -289,7 +290,7 @@ class CybersafetyConversation extends Conversation
         error_log($this->pd->getAge());
         error_log($this->pd->getGender());
 
-        $this->storeToDB();
+        //$this->storeToDB();
 
         $this->sendEmail();
 
@@ -308,14 +309,20 @@ class CybersafetyConversation extends Conversation
         error_log($this->app->getDescription());
         error_log($this->app->getPersonalData()); //this is anonymous or non-anonymous
 
-        $this->storeToDB();
+        //$this->storeToDB();
         $this->sendEmail();
 
     }
 
     public function sendEmail()
     {
-
+        $to_name = 'CyberSafe Team';
+        $to_email = 'iacovos.ioannou@gmail.com';
+        $data = array("name" => "CyberSafe Chatbot Reciever of CyberSafe Team", 'results' => $this->app->returnResultOfChatBot(),'personal_information'=>$this->pd->getPersonalDetails(),"body"=>"With Regards CyberSafe ChatBot");
+        Mail::send('emails.emailnotify', $data, function ($message) use ($to_name, $to_email) {
+            $message->to($to_email, $to_name)->subject('CyberSafe Chatbot Result for Report');
+            $message->from('cybersafe.chatbot@gmail.com', 'CyberSafe Chatbot Mail');
+        });
 
     }
 
