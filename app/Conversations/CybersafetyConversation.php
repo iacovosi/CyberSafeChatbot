@@ -58,7 +58,7 @@ class CybersafetyConversation extends Conversation
 //                $this->where = $answer->getValue();
                 App::setLocale($answer->getValue());
 
-                 $this->say("Hello,Για".@lang('lang.choose'));
+                 $this->say("Hello,Για".trans('lang.choose'));
             }
             else {
                 App::setLocale("en");
