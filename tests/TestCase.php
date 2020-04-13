@@ -19,4 +19,6 @@ abstract class TestCase extends BaseTestCase
      * @var BotManTester
      */
     protected $bot;
+
+
 }

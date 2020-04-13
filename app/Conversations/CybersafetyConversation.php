@@ -385,7 +385,7 @@ class CybersafetyConversation extends Conversation
         error_log($this->pd->getAge());
         error_log($this->pd->getGender());
 
-        $this->storeToDB();
+//        $this->storeToDB();
 
         $this->sendEmail();
 
@@ -406,7 +406,7 @@ class CybersafetyConversation extends Conversation
         error_log($this->app->getPersonalData()); //this is anonymous or non-anonymous
 
         $this->storeToDB();
-//        $this->sendEmail();
+        $this->sendEmail();
 
     }
 
@@ -414,7 +414,7 @@ class CybersafetyConversation extends Conversation
     {
 
         $to_name = 'CyberSafe Team';
-        $to_email = 'iacovos.ioannou@gmail.com';
+        $to_email = 'andreas.charalampous.cy@gmail.com';
 //        $data = array("name" => "CyberSafe Chatbot Receiver of CyberSafe Team", 'results' => $this->app->returnResultOfChatBot(),'personal_information'=>$this->pd->getPersonalDetails(),"body"=>"With Regards CyberSafe ChatBot");
         $data = array("name" => "CyberSafe Chatbot Reciever of CyberSafe Team", 'results' => $this->app->returnResultOfChatBot(), 'personal_information' => $this->pd->getPersonalDetails(), "body" => "With Regards CyberSafe ChatBot");
 
