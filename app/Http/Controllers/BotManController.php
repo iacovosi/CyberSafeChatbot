@@ -24,7 +24,7 @@ class BotManController extends Controller
      */
     public function tinker()
     {
-        return view('tinker');
+        return view('welcome');
     }
 
     /**
@@ -50,9 +50,7 @@ class BotManController extends Controller
      */
     public function startConversationIacovos(BotMan $bot)
     {
-        $bot->reply("agoouri");
-        //dd("Shiut");
-        $bot->startConversation(new ExampleConversationIacovos());
+               $bot->startConversation(new ExampleConversationIacovos());
     }
 
 

@@ -7,45 +7,32 @@ use BotMan\BotMan\Messages\Conversations\Conversation;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use BotMan\BotMan\Messages\Outgoing\Question;
-
 //use App\Mail\TestMail;
-//use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Mail;
 use App\utilities\Application;
 use App\utilities\PersonalDetails;
-use Mail;
 use App\Report;
+use App;
 
 class CybersafetyConversation extends Conversation
 {
 
     public $app;
     public $pd;
+    public $locale;
+
 
     public function welcome()
     {
-        $this->app = new Application();
-        $this->AskLocale();
-        $this->say('Hello, Welcome to Cybersafety website');
-        $question = Question::create("Hotline or Helpline?")
-            ->fallback('Unable to ask question')
-            ->callbackId('ask_what')
-            ->addButtons([
-                Button::create('Hotline')->value('hotline'),
-                Button::create('Helpline')->value('helpline'),
 
-            ]);
-        $this->ask($question, function (Answer $answer) {
-            if ($answer->isInteractiveMessageReply()) {
-                $this->app->setCategory($answer->getValue());
-//                error_log($this->app->getCategory());
-            }
-            $this->askWhere();
-        });
+        $this->AskLocale();
+
 
     }
 
-    public function AskLocale() {
-        $question = Question::create("Language?")
+    public function AskLocale()
+    {
+        $question = Question::create("Language / Γλώσσα ?")
             ->fallback('Unable to ask question')
             ->callbackId('ask_reason')
             ->addButtons([
@@ -56,89 +43,167 @@ class CybersafetyConversation extends Conversation
         $this->ask($question, function (Answer $answer) {
             if ($answer->isInteractiveMessageReply()) {
 //                $this->where = $answer->getValue();
-                App::setLocale($answer->getValue());
+                $this->locale = $answer->getValue();
+                App::setLocale($this->locale);
+                $this->say(__('lang.choose'));
 
-                 $this->say("Hello,Για".trans('lang.choose'));
+            } else {
+//                App::setLocale("en");
+                $this->say(__('lang.choose'));
             }
-            else {
-                App::setLocale("en");
+
+
+            $this->askCategory();
+
+        });
+
+
+    }
+
+
+    public function askCategory()
+    {
+        $this->app = new Application();
+        App::setLocale($this->locale);
+//        $this->AskLocale();
+//        $this->say('Hello, Welcome to Cybersafety website');
+        $question = Question::create("" . trans('lang.hothelp'))
+            ->fallback('Unable to ask question')
+            ->callbackId('ask_what')
+            ->addButtons([
+                Button::create("" . trans('lang.hotline'))->value('hotline'),
+                Button::create("" . trans('lang.helpline'))->value('helpline'),
+
+            ]);
+        $this->ask($question, function (Answer $answer) {
+            if ($answer->isInteractiveMessageReply()) {
+                $this->app->setCategory($answer->getValue());
+//                error_log($this->app->getCategory());
+
+                $this->askWhere();
+            } else {
+
+                $this->say("" . trans('lang.mandatory_selection'));
+                $this->askCategory();
             }
         });
+
     }
+
 
     public function askWhere()
     {
-        $question = Question::create("Please select where the incident occured")
+        App::setLocale($this->locale);
+        $question = Question::create(__('lang.where'))
             ->fallback('Unable to ask question')
             ->callbackId('ask_reason')
             ->addButtons([
-                Button::create('Website')->value('website'),
-                Button::create('Chat room')->value('chat_room'),
-                Button::create('Mobile communication')->value('mobile_communication'),
-                Button::create('Social Media')->value('social_media'),
-                Button::create('Email')->value('email'),
+                Button::create("" . trans('lang.website'))->value('website'),
+                Button::create("" . trans('lang.chat_room'))->value('chat_room'),
+                Button::create("" . trans('lang.mobile_communication'))->value('mobile_communication'),
+                Button::create("" . trans('lang.social_media'))->value('social_media'),
+                Button::create("" . trans('lang.email'))->value('email'),
             ]);
 
         $this->ask($question, function (Answer $answer) {
             if ($answer->isInteractiveMessageReply()) {
 //                $this->where = $answer->getValue();
                 $this->app->setWhere($answer->getValue());
+
+
+                if ($answer->getValue() == 'website' || $answer->getValue() == 'chat_room' || $answer->getValue() == 'social_media' || $answer->getValue() == 'email')
+                    $this->askUrl();
+                else {
+
+                    if ($this->app->getCategory() == 'hotline')
+                        $this->askTypeHotline();
+                    else {
+                        $this->askTypeHelpline();
+                    }
+                }
+
             }
+
+        });
+    }
+
+
+    public function askUrl()
+    {
+
+
+        App::setLocale($this->locale);
+        $question = Question::create(__('lang.url'))
+            ->fallback('Unable to ask question')
+            ->callbackId('ask_url');
+
+        $this->ask($question, function (Answer $answer) {
+//            $this->type = $answer->getValue();
+            $this->app->setURL($answer->getValue());
+
+
             if ($this->app->getCategory() == 'hotline')
                 $this->askTypeHotline();
             else {
                 $this->askTypeHelpline();
             }
+
+
         });
+
+
     }
 
 
     public function askTypeHotline()
     {
-
-        $question = Question::create("Please select the type of content of the incident")
+        App::setLocale($this->locale);
+        $question = Question::create("" . trans('lang.ask_type'))
             ->fallback('Unable to ask question')
             ->callbackId('ask_type')
             ->addButtons([
-                Button::create('Child Pornography')->value('child_pornography'),
-                Button::create('Hijacking')->value('hijacking'),
-                Button::create('Network Hijacking')->value('network_hijacking'),
-                Button::create('Cyber Fraud')->value('cyber_fraud'),
-                Button::create('Hate Speech')->value('hate_speech'),
-                Button::create('Other')->value('other')
+                Button::create("" . trans('lang.child_pornography'))->value('child_pornography'),
+                Button::create("" . trans('lang.hijacking'))->value('hijacking'),
+                Button::create("" . trans('lang.network_hijacking'))->value('network_hijacking'),
+                Button::create("" . trans('lang.cyber_fraud'))->value('cyber_fraud'),
+                Button::create("" . trans('lang.hate_speech'))->value('hate_speech'),
+                Button::create("" . trans('lang.other'))->value('other')
             ]);
 
         $this->ask($question, function (Answer $answer) {
             if ($answer->isInteractiveMessageReply()) {
                 $this->type = $answer->getValue();
                 $this->app->setType($answer->getValue());
+
+                $this->askDescribe();
             }
-            $this->askDescribe();
+
         });
     }
 
     public function askTypeHelpline()
     {
-
-        $question = Question::create("Please select the type of content of the incident")
+        App::setLocale($this->locale);
+        $question = Question::create("" . trans('lang.ask_type'))
             ->fallback('Unable to ask question')
             ->callbackId('ask_type')
             ->addButtons([
-                Button::create('Cyberbullying')->value('cyberbullying'),
-                Button::create('Excessive use')->value('excessive_use'),
-                Button::create('Love / Realationships / Sexuality (online)')->value('love_relationships_sexuality'),
-                Button::create('Sexting ')->value('sexting'),
-                Button::create('Sexual harassment')->value('sexual harassment'),
-                Button::create('Grooming ')->value('Grooming'),
-                Button::create('E-crime')->value('E-crime'),
-                Button::create('Hate speech')->value('hate_speech'),
-                Button::create('Potentially harmful content')->value('potentially_harmful_content'),
-                Button::create('Gaming')->value('Gaming'),
-                Button::create('Online reputation')->value('Online reputation'),
-                Button::create('Technical settings')->value('technical_settings'),
-                Button::create('Advertising / commercialism')->value('advertising_commercialism'),
-                Button::create('Media literacy / education')->value('media_literacy_education'),
-                Button::create('Data privacy')->value('data_privacy'),
+                Button::create("" . trans('lang.cyberbullying'))->value('cyberbullying'),
+                Button::create("" . trans('lang.excessive_use'))->value('excessive_use'),
+                Button::create("" . trans('lang.love'))->value('love_relationships_sexuality'),
+                Button::create("" . trans('lang.sexting'))->value('sexting'),
+                Button::create("" . trans('lang.sextortion'))->value('sextortion'),
+                Button::create("" . trans('lang.sexual_harassment'))->value('sexual harassment'),
+                Button::create("" . trans('lang.grooming'))->value('Grooming'),
+                Button::create("" . trans('lang.ecrime'))->value('E-crime'),
+                Button::create("" . trans('lang.hate_speech'))->value('hate_speech'),
+                Button::create("" . trans('lang.harmfull_content'))->value('potentially_harmful_content'),
+                Button::create("" . trans('lang.gaming'))->value('Gaming'),
+                Button::create("" . trans('lang.online_reputation'))->value('Online reputation'),
+                Button::create("" . trans('lang.technical_settings'))->value('technical_settings'),
+                Button::create("" . trans('lang.advertising'))->value('advertising_commercialism'),
+                Button::create("" . trans('lang.media'))->value('media_literacy_education'),
+                Button::create("" . trans('lang.privacy'))->value('data_privacy')
 
             ]);
 
@@ -146,8 +211,10 @@ class CybersafetyConversation extends Conversation
             if ($answer->isInteractiveMessageReply()) {
 //                $this->type = $answer->getValue();
                 $this->app->setType($answer->getValue());
+
+                $this->askDescribe();
             }
-            $this->askDescribe();
+
         });
 
 
@@ -155,8 +222,8 @@ class CybersafetyConversation extends Conversation
 
     public function askDescribe()
     {
-
-        $question = Question::create("Please describe the incident")
+        App::setLocale($this->locale);
+        $question = Question::create("" . trans('lang.describe_incident'))
             ->fallback('Unable to ask question')
             ->callbackId('ask_describe');
 
@@ -170,13 +237,13 @@ class CybersafetyConversation extends Conversation
 
     public function askPersonalData()
     {
-
-        $question = Question::create("Please select one of the two")
+        App::setLocale($this->locale);
+        $question = Question::create("" . trans('lang.one_of_two'))
             ->fallback('Unable to ask question')
             ->callbackId('ask_personal_data')
             ->addButtons([
-                Button::create('I prefer staying anonymous')->value('anonymous'),
-                Button::create('I prefer submitting my personal details (strictly confidential)')->value('submit_personal_details'),
+                Button::create("" . trans('lang.anonymous'))->value('anonymous'),
+                Button::create("" . trans('lang.submit'))->value('submit_personal_details'),
             ]);
 
 
@@ -184,25 +251,26 @@ class CybersafetyConversation extends Conversation
             if ($answer->isInteractiveMessageReply()) {
 //                $this->personal_data = $answer->getValue();
                 $this->app->setPersonalData($answer->getValue());
+
+
+                if ($this->app->getPersonalData() == 'anonymous') {
+
+                    $this->say("" . trans('lang.thanks'));
+                    $this->doNotStore();
+                } else {
+                    $this->pd = new PersonalDetails();
+                    $this->askName();
+                }
             }
-
-            if ($this->app->getPersonalData() == 'anonymous') {
-
-                $this->say('Thank you for contacting us');
-                $this->doNotStore();
-            } else {
-                $this->pd = new PersonalDetails();
-                $this->askName();
-            }
-
         });
 
     }
 
     public function askName()
     {
+        App::setLocale($this->locale);
 
-        $question = Question::create("Please give us your name")
+        $question = Question::create("" . trans('lang.name'))
             ->fallback('Unable to ask question')
             ->callbackId('ask_name');
 
@@ -215,8 +283,9 @@ class CybersafetyConversation extends Conversation
 
     public function askSurname()
     {
+        App::setLocale($this->locale);
 
-        $question = Question::create("Please give us your surname")
+        $question = Question::create("" . trans('lang.surname'))
             ->fallback('Unable to ask question')
             ->callbackId('ask_surname');
 
@@ -228,8 +297,9 @@ class CybersafetyConversation extends Conversation
 
     public function askEmail()
     {
+        App::setLocale($this->locale);
 
-        $question = Question::create("Please give us your email")
+        $question = Question::create("" . trans('lang.email2'))
             ->fallback('Unable to ask question')
             ->callbackId('ask_email');
 
@@ -241,8 +311,8 @@ class CybersafetyConversation extends Conversation
 
     public function askPhone()
     {
-
-        $question = Question::create("Please give us your phone")
+        App::setLocale($this->locale);
+        $question = Question::create("" . trans('lang.phone'))
             ->fallback('Unable to ask question')
             ->callbackId('ask_phone');
 
@@ -254,8 +324,8 @@ class CybersafetyConversation extends Conversation
 
     public function askAge()
     {
-
-        $question = Question::create("Please give us your age")
+        App::setLocale($this->locale);
+        $question = Question::create("" . trans('lang.age'))
             ->fallback('Unable to ask question')
             ->callbackId('ask_age')
             ->addButtons([
@@ -276,8 +346,8 @@ class CybersafetyConversation extends Conversation
 
     public function askGender()
     {
-
-        $question = Question::create("Please give us your gender")
+        App::setLocale($this->locale);
+        $question = Question::create("" . trans('lang.gender'))
             ->fallback('Unable to ask question')
             ->callbackId('ask_gender')
             ->addButtons([
@@ -292,7 +362,7 @@ class CybersafetyConversation extends Conversation
             }
 
             $this->app->setPersonalDetails($this->pd);
-            $this->say('Thank you for contacting us');
+            $this->say("" . trans('lang.thanks'));
 
             $this->doStore();
 
@@ -329,26 +399,29 @@ class CybersafetyConversation extends Conversation
 
         error_log($this->app->getCategory());
         error_log($this->app->getWhere());
+        error_log($this->app->getUrl());
         error_log($this->app->getType());
         error_log($this->app->getDescription());
         error_log($this->app->getPersonalData()); //this is anonymous or non-anonymous
 
         $this->storeToDB();
-        $this->sendEmail();
+//        $this->sendEmail();
 
     }
 
-    //cybersafe.chatbot@gmail.com
-    //chat123!
     public function sendEmail()
     {
+
         $to_name = 'CyberSafe Team';
         $to_email = 'iacovos.ioannou@gmail.com';
+//        $data = array("name" => "CyberSafe Chatbot Receiver of CyberSafe Team", 'results' => $this->app->returnResultOfChatBot(),'personal_information'=>$this->pd->getPersonalDetails(),"body"=>"With Regards CyberSafe ChatBot");
         $data = array("name" => "CyberSafe Chatbot Reciever of CyberSafe Team", 'results' => $this->app->returnResultOfChatBot(), 'personal_information' => $this->pd->getPersonalDetails(), "body" => "With Regards CyberSafe ChatBot");
+
         Mail::send('emails.emailnotify', $data, function ($message) use ($to_name, $to_email) {
             $message->to($to_email, $to_name)->subject('CyberSafe Chatbot Result for Report');
             $message->from('cybersafe.chatbot@gmail.com', 'CyberSafe Chatbot Mail');
         });
+
 
     }
 
@@ -358,6 +431,7 @@ class CybersafetyConversation extends Conversation
         $data = Array();
         $data['category'] = $this->app->getCategory();
         $data['where'] = $this->app->getWhere();
+        $data['url'] = $this->app->getUrl();            //add the URL to migration
         $data['type'] = $this->app->getType();
         $data['description'] = $this->app->getDescription();
         $data['personal_data'] = $this->app->getPersonalData();
@@ -369,6 +443,7 @@ class CybersafetyConversation extends Conversation
         $data['age'] = $this->pd->getAge();
         $data['gender'] = $this->pd->getGender();
         $id = Report::create($data)->id;
+
 
     }
 

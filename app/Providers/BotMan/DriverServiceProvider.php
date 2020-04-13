@@ -13,7 +13,7 @@ class DriverServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    protected $drivers = [];
+    protected $drivers = ['\BotMan\Drivers\Web\WebDriver::class'];
 
     /**
      * @return void
