@@ -16,6 +16,7 @@ class CreateReportsTable extends Migration
         Schema::create('reports', function (Blueprint $table) {
             $table->increments('id');
             $table->string('category')->nullable(true)->default('N/A');
+            $table->string('url')->nullable(true)->default('N/A');
             $table->string('where')->nullable(true)->default('N/A');
             $table->string('type')->nullable(true)->default('N/A');
             $table->string('description')->nullable(true)->default('N/A');

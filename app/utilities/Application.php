@@ -25,7 +25,7 @@ class Application
     /**
      * @param mixed $url
      */
-    public function setUrl($url): void
+    public function setUrl($url)
     {
         $this->url = $url;
     }
@@ -129,7 +129,7 @@ class Application
 
     public function returnResultOfChatBot()
     {
-        return "Category: " . $this->category . " where :" . $this->where . " type " . $this->type . " description:" . $this->description . " personal data: " . $this->personal_data . " personal details:" . $this->personal_details;
+        return "Category: " . $this->category . " where :" . $this->where ." url:".$this->url. " type " . $this->type . " description:" . $this->description . " personal data: " . $this->personal_data . " personal details:" . $this->personal_details;
 
     }
 

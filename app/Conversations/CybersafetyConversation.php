@@ -26,6 +26,7 @@ class CybersafetyConversation extends Conversation
     {
 
         $this->AskLocale();
+        //$this->sendEmail();
 
 
     }
